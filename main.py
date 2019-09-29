@@ -14,4 +14,13 @@ async def simon(ctx):
     await ctx.message.add_reaction('💕')
     await ctx.send(string)
 
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    message = reaction.message
+
+    if message.author.id == bot.user.id:
+        await message.channel.send(reaction)
+
+
 bot.run(discord_secret)
