@@ -15,8 +15,9 @@ async def button_pressed(*, user, button):
 @bot.command()
 async def simon(ctx):
     string = "Welcome to *Simón!*"
-    await ctx.message.add_reaction('💕')
-    await ctx.send(string)
+    own_message = await ctx.send(string)
+    await own_message.add_reaction('💕')
+
 
 
 @bot.event
