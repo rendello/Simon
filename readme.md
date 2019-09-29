@@ -1,5 +1,5 @@
 
-![Simon header](Artwork/simon-header.jpg "Simon header")
-# **Simon 💕**: The *Simon Says* bot for Discord!
+![Simón header](Artwork/simón-header.jpg "Simon header")
+# **Simón 💕**: The *Simon Says* bot for Discord!
 
 *Work in progress! Check out the dev branch for updates! Releases soon!*
