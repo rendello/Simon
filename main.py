@@ -11,7 +11,7 @@ bot = commands.Bot(command_prefix="!")
 @bot.command()
 async def simon(ctx):
     string = "Welcome to *Simón!*"
-    await ctx.add_reaction('\:green_heart:')
+    await ctx.message.add_reaction('💕')
     await ctx.send(string)
 
 bot.run(discord_secret)
