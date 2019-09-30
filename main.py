@@ -12,7 +12,6 @@ from secrets import discord_secret
 
 bot = commands.Bot(command_prefix="!")
 
-buttons = '🔴💚🔷🍊'
 
 
 # ------ User functions --------
@@ -59,49 +58,76 @@ async def button_pressed(*, user, button):
 
 # ---------- Classes -----------
 class Match():
-    ''' A given match of Simón. '''
+    ''' A given game match of Simón. '''
 
     def __init__(self, ctx):
         self.ctx = ctx
-        self.message_ids = {}
+        self.messages = {}
 
-    def send(self)
-        _id = await ctx.send("Welcome to *Simón!*")
-        self.message_ids['intro'] = _id}
+        self.buttons = '' # To be set later by set_buttons
+
+
+    async def set_buttons(self, potential_buttons):
+        ''' Gets the emojis sent to it and uses them if it can. Sets
+            self.buttons itself since __init__ won't accept asyncronous code.
+        '''
+        buttons = strip_non_emojis(potential_buttons)
+
+        if buttons == '':
+            await self.ctx.send_message(text='No emojis found! Defaulting to normal buttons', _id='warning')
+            self.buttons = '🔴💚🔷🍊'
+
+        if len(buttons) > 10:
+            await self.ctx.send_message(text='Max of ten emojis', _id='warning')
+            self.buttons = buttons[:10]
+
+        self.buttons = buttons
+
+
+    async def send_message(self, *, text, section):
+        _id = await self.ctx.send(text)
+        self.messages[section] = _id
+
+
+    async def append_to_message(self, *, text, section):
+        message = self.messages[section]
+        await message.edit(content=f'{message.content}{text}')
+
+
+    async def add_button(self, *, button, section):
+        await self.messages[section].add_reaction(button)
+
+
+    async def add_buttons(self, *, buttons, section):
+        for button in buttons:
+            await self.add_button(button=button, section=section)
+
+
+    async def intro_sequence(self):
+        await self.send_message(text="Welcome to *Simón!*", section='intro')
+        await asyncio.sleep(1)
+        await self.append_to_message(text="\nLook at this net:", section='intro')
+        await self.add_buttons(buttons=self.buttons, section='intro')
 
 
 
 # ---------- Commands ----------
 @bot.command()
-async def simon(ctx, *, buttons=buttons):
+async def simon(ctx, *, potential_buttons='🔴💚🔷🍊'):
+    match = Match(ctx)
+    await match.set_buttons(potential_buttons)
 
-    buttons = strip_non_emojis(buttons)
-    if buttons == '':
-        await ctx.send('No usable emojis found!')
-
-    if len(buttons) > 10:
-        await ctx.send('Max of ten emojis')
-        buttons = buttons[:10]
-
-    own_message = await ctx.send("Welcome to *Simón!*")
-
-    welcome_text = "\nIn this game, I'll make a pattern with the following reacts:"
-    await asyncio.sleep(3)
-    await own_message.edit(content=f'{own_message.content} {welcome_text}')
-    await asyncio.sleep(2)
-
-    for button in buttons:
-        await own_message.add_reaction(button)
+    await match.intro_sequence()
 
 
 
 # ----------- Events -----------
 @bot.event
-async def on_reaction_add(reaction, user):
-    message = reaction.message
+async def on_buttonion_add(reaction, user):
+    message = buttonion.message
 
     if message.author.id == bot.user.id:
-        await button_pressed(user=user.id, button=reaction)
+        await button_pressed(user=user.id, button=buttonion)
 
 
 @bot.event
