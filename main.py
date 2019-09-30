@@ -51,8 +51,6 @@ def strip_non_emojis(text):
 
 
 # -- User functions (async) ----
-async def button_pressed(*, user, button):
-    print(user, button)
 
 
 
@@ -63,6 +61,9 @@ class Match():
     def __init__(self, ctx):
         self.ctx = ctx
         self.messages = {}
+        self.player = ctx.author
+
+        self.last_button_press = {'id': 0, 'button': ''}
 
         # Variables below are initialized only. Their values will be set by
         # async_init.
@@ -112,6 +113,36 @@ class Match():
             await self.add_button(button=button, section=section)
 
 
+    async def remove_all_messages(self):
+        for message in self.messages.values():
+            await message.delete()
+
+
+    # --- Game
+    async def button_pressed(self, *, user, button):
+        if user == self.player.id:
+            button_press_id = self.last_button_press['id']
+            self.last_button_press = {'id': button_press_id, 'button': button}
+
+
+    async def add_to_sequence(self, sequence):
+        sequence.append(random.choice(self.buttons))
+        return sequence
+
+    
+    async def perform_turn(self):
+        #self.sequence = self.add_to_sequence(sequence)
+        #self.send_message(text='New sequence')
+
+        last_button_press = self.last_button_press
+
+        while last_button_press == self.last_button_press:
+            await asyncio.sleep(1)
+            await self.ctx.send(f'{last_button_press} : {self.last_button_press}')
+        else:
+            await self.ctx.send(f'{last_button_press} : {self.last_button_press}')
+
+
     async def intro_sequence(self):
         await self.send_message(text="Welcome to *Simón!*", section='intro')
         await asyncio.sleep(1)
@@ -119,38 +150,42 @@ class Match():
         await self.add_buttons(buttons=self.buttons, section='intro')
 
 
-    async def remove_all_messages(self):
-        for message in self.messages.values():
-            await message.delete()
 
-
+# ---------- Globals -----------
+match = None
 
 # ---------- Commands ----------
 @bot.command()
 async def simon(ctx, *, potential_buttons='🔴💚🔷🍊'):
+    global match
 
     match = Match(ctx)
     await match.async_init(ctx, potential_buttons)
 
     await match.intro_sequence()
+    await match.perform_turn()
 
 
 
 # ----------- Events -----------
 @bot.event
 async def on_reaction_add(reaction, user):
+    global match
+
     message = reaction.message
 
     if message.author.id == bot.user.id:
-        await button_pressed(user=user.id, button=reaction)
+        await match.button_pressed(user=user.id, button=reaction)
 
 
 @bot.event
 async def on_reaction_remove(reaction, user):
+    global match
+
     message = reaction.message
 
     if message.author.id == bot.user.id:
-        await button_pressed(user=user.id, button=reaction)
+        await match.button_pressed(user=user.id, button=reaction)
 
 
 if __name__ == '__main__':
