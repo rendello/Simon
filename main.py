@@ -57,6 +57,20 @@ async def button_pressed(*, user, button):
 
 
 
+# ---------- Classes -----------
+class Match():
+    ''' A given match of Simón. '''
+
+    def __init__(self, ctx):
+        self.ctx = ctx
+        self.message_ids = {}
+
+    def send(self)
+        _id = await ctx.send("Welcome to *Simón!*")
+        self.message_ids['intro'] = _id}
+
+
+
 # ---------- Commands ----------
 @bot.command()
 async def simon(ctx, *, buttons=buttons):
@@ -72,14 +86,12 @@ async def simon(ctx, *, buttons=buttons):
     own_message = await ctx.send("Welcome to *Simón!*")
 
     welcome_text = "\nIn this game, I'll make a pattern with the following reacts:"
-    await asyncio.sleep(1)
+    await asyncio.sleep(3)
     await own_message.edit(content=f'{own_message.content} {welcome_text}')
     await asyncio.sleep(2)
 
     for button in buttons:
         await own_message.add_reaction(button)
-
-
 
 
 
