@@ -69,11 +69,17 @@ async def simon(ctx, *, buttons=buttons):
         await ctx.send('Max of ten emojis')
         buttons = buttons[:10]
 
-    string = "Welcome to *Simón!*"
-    own_message = await ctx.send(string)
+    own_message = await ctx.send("Welcome to *Simón!*")
+
+    welcome_text = "\nIn this game, I'll make a pattern with the following reacts:"
+    await asyncio.sleep(1)
+    await own_message.edit(content=f'{own_message.content} {welcome_text}')
+    await asyncio.sleep(2)
 
     for button in buttons:
         await own_message.add_reaction(button)
+
+
 
 
 
