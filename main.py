@@ -121,7 +121,7 @@ class Match():
     # --- Game
     async def button_pressed(self, *, user, button):
         if user == self.player.id:
-            button_press_id = self.last_button_press['id']
+            button_press_id = self.last_button_press['id'] + 1
             self.last_button_press = {'id': button_press_id, 'button': button}
 
 
@@ -137,10 +137,10 @@ class Match():
         last_button_press = self.last_button_press
 
         while last_button_press == self.last_button_press:
-            await asyncio.sleep(1)
+            await asyncio.sleep(3)
             await self.ctx.send(f'{last_button_press} : {self.last_button_press}')
         else:
-            await self.ctx.send(f'{last_button_press} : {self.last_button_press}')
+            await self.ctx.send(f'\n\n--UPDATED--\n\n')
 
 
     async def intro_sequence(self):
@@ -163,7 +163,8 @@ async def simon(ctx, *, potential_buttons='🔴💚🔷🍊'):
     await match.async_init(ctx, potential_buttons)
 
     await match.intro_sequence()
-    await match.perform_turn()
+    while True:
+        await match.perform_turn()
 
 
 
