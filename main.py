@@ -64,7 +64,16 @@ class Match():
         self.ctx = ctx
         self.messages = {}
 
-        self.buttons = '' # To be set later by set_buttons
+        # Variables below are initialized only. Their values will be set by
+        # async_init.
+        self.buttons = ''
+
+
+    async def async_init(self, ctx, potential_buttons):
+        ''' Must be called manually. The regular __init__ doesn't accept any
+            async.
+        '''
+        self.buttons = await self.set_buttons(potential_buttons)
 
 
     async def set_buttons(self, potential_buttons):
@@ -74,14 +83,14 @@ class Match():
         buttons = strip_non_emojis(potential_buttons)
 
         if buttons == '':
-            await self.ctx.send_message(text='No emojis found! Defaulting to normal buttons', _id='warning')
-            self.buttons = '🔴💚🔷🍊'
+            await self.send_message(text='No emojis found! Defaulting to normal buttons', section='warning')
+            return '🔴💚🔷🍊'
 
         if len(buttons) > 10:
-            await self.ctx.send_message(text='Max of ten emojis', _id='warning')
-            self.buttons = buttons[:10]
+            await self.send_message(text='Max of ten emojis', section='warning')
+            return buttons[:10]
 
-        self.buttons = buttons
+        return buttons
 
 
     async def send_message(self, *, text, section):
@@ -114,8 +123,9 @@ class Match():
 # ---------- Commands ----------
 @bot.command()
 async def simon(ctx, *, potential_buttons='🔴💚🔷🍊'):
+
     match = Match(ctx)
-    await match.set_buttons(potential_buttons)
+    await match.async_init(ctx, potential_buttons)
 
     await match.intro_sequence()
 
