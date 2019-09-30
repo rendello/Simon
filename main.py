@@ -133,11 +133,11 @@ async def simon(ctx, *, potential_buttons='🔴💚🔷🍊'):
 
 # ----------- Events -----------
 @bot.event
-async def on_buttonion_add(reaction, user):
-    message = buttonion.message
+async def on_reaction_add(reaction, user):
+    message = reaction.message
 
     if message.author.id == bot.user.id:
-        await button_pressed(user=user.id, button=buttonion)
+        await button_pressed(user=user.id, button=reaction)
 
 
 @bot.event
