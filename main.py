@@ -24,9 +24,11 @@ def check_against_sequence(real_sequence, user_sequence):
     ''' Checks the user's sequence against the actual sequence.
 
         Args:
+            real_sequence: <list> of correct button presses.
+            user_sequence: <list> of user's button presses.
 
         Returns:
-            "continuing" if user's sequence is correct *so far*,
+            "continue" if user's sequence is correct *so far*,
             "passed" if sequences match exactly,
             "failed" if user's sequence does not match.
     '''
@@ -40,7 +42,7 @@ def check_against_sequence(real_sequence, user_sequence):
         if user_button != real_button:
             return "failed"
 
-    return "continuing"
+    return "continue"
 
 
 def strip_non_emojis(text):
@@ -62,6 +64,10 @@ async def simon(ctx, *, buttons=buttons):
     buttons = strip_non_emojis(buttons)
     if buttons == '':
         await ctx.send('No usable emojis found!')
+
+    if len(buttons) > 10:
+        await ctx.send('Max of ten emojis')
+        buttons = buttons[:10]
 
     string = "Welcome to *Simón!*"
     own_message = await ctx.send(string)
