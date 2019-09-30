@@ -66,17 +66,17 @@ class Match():
 
         # Variables below are initialized only. Their values will be set by
         # async_init.
-        self.buttons = ''
+        self.buttons = str()
 
 
     async def async_init(self, ctx, potential_buttons):
         ''' Must be called manually. The regular __init__ doesn't accept any
             async.
         '''
-        self.buttons = await self.set_buttons(potential_buttons)
+        self.buttons = await self.get_buttons(potential_buttons)
 
 
-    async def set_buttons(self, potential_buttons):
+    async def get_buttons(self, potential_buttons):
         ''' Gets the emojis sent to it and uses them if it can. Sets
             self.buttons itself since __init__ won't accept asyncronous code.
         '''
@@ -117,6 +117,11 @@ class Match():
         await asyncio.sleep(1)
         await self.append_to_message(text="\nLook at this net:", section='intro')
         await self.add_buttons(buttons=self.buttons, section='intro')
+
+
+    async def remove_all_messages(self):
+        for message in self.messages.values():
+            await message.delete()
 
 
 
