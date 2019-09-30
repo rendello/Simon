@@ -3,6 +3,7 @@
 import random
 import asyncio
 
+import emoji
 import discord
 from discord.ext import commands
 
@@ -11,7 +12,7 @@ from secrets import discord_secret
 
 bot = commands.Bot(command_prefix="!")
 
-buttons = ['🔴', '💚', '🔷', '🍊']
+buttons = '🔴💚🔷🍊'
 
 
 # ------ User functions --------
@@ -42,6 +43,12 @@ def check_against_sequence(real_sequence, user_sequence):
     return "continuing"
 
 
+def strip_non_emojis(text):
+    text = [c for c in text if c in emoji.UNICODE_EMOJI]
+    emoji_only_text = ''.join(text)
+    return emoji_only_text
+
+
 # -- User functions (async) ----
 async def button_pressed(*, user, button):
     print(user, button)
@@ -50,7 +57,12 @@ async def button_pressed(*, user, button):
 
 # ---------- Commands ----------
 @bot.command()
-async def simon(ctx):
+async def simon(ctx, *, buttons=buttons):
+
+    buttons = strip_non_emojis(buttons)
+    if buttons == '':
+        await ctx.send('No usable emojis found!')
+
     string = "Welcome to *Simón!*"
     own_message = await ctx.send(string)
 
