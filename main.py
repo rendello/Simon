@@ -65,6 +65,7 @@ class Match():
         self.turn_no = 1
         self.sequence = ''
         self.user_sequence = ''
+        self.status = 'continue'
 
         self.last_button_press = {'id': 0, 'button': ''}
 
@@ -145,7 +146,7 @@ class Match():
             sequence_check = check_against_sequence(self.sequence, self.user_sequence) 
 
             if sequence_check == 'failed':
-                return await self.game_over()
+                await self.game_over()
             elif sequence_check == 'passed':
                 self.user_sequence = ''
                 return
@@ -164,8 +165,9 @@ class Match():
 
 
     async def game_over(self):
-        await self.send_message(text=f'You lost on turn {self.turn_no}.', section='loss')
-        return 'failed'
+        await self.send_message(text=f'Oh No!!! You lost on turn {self.turn_no}!', section='loss')
+        asyncio.sleep(2)
+        self.status = 'failed'
 
 
     async def intro_sequence(self):
@@ -190,13 +192,14 @@ async def simon(ctx, *, potential_buttons='🔴💚🔷🍊'):
     await match.intro_sequence()
 
     while True:
-        status = await match.perform_turn()
-        print(status)
+        await match.perform_turn()
 
-        if status == 'failed':
+        print(match.status)
+        if match.status == 'failed':
             asyncio.wait(7)
-            match.remove_all_messages()
-            match.send_message(text="Thanks for playing Simón! To start a new match, type !simon :D", section='thanks')
+            await match.remove_all_messages()
+            await match.send_message(text="Thanks for playing Simón! To start a new match, type !simon :D", section='thanks')
+            break
 
 
 
