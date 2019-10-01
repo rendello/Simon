@@ -63,6 +63,8 @@ class Match():
         self.messages = {}
         self.player = ctx.author
         self.turn_no = 1
+        self.sequence = ''
+        self.user_sequence = ''
 
         self.last_button_press = {'id': 0, 'button': ''}
 
@@ -127,7 +129,7 @@ class Match():
 
 
     async def add_to_sequence(self, sequence):
-        sequence.append(random.choice(self.buttons))
+        sequence += random.choice(self.buttons)
         return sequence
 
     
@@ -138,24 +140,26 @@ class Match():
             while last_button_press == self.last_button_press:
                 await asyncio.sleep(0.1)
             else:
-                user_sequence.append(self.last_button_press.emoji)
+                print(f'\n\n\n\n\n{self.last_button_press["button"].emoji}\n\n\n\n\n\n')
+                self.user_sequence += self.last_button_press['button'].emoji
 
-            sequence_check = check_against_sequence(self.sequence, user_sequence) 
+            sequence_check = check_against_sequence(self.sequence, self.user_sequence) 
 
             if sequence_check == 'failed':
-                self.game_over()
+                await self.game_over()
             elif sequence_check == 'passed':
+                self.user_sequence = ''
                 return
             elif sequence_check == 'continue':
-                self.wait_and_check_button_press()
+                await wait_and_check_button_press(self)
 
 
-        self.sequence = self.add_to_sequence(sequence)
-        self.send_message(text='New sequence')
+        self.sequence = await self.add_to_sequence(self.sequence)
+        await self.send_message(text=f'New sequence: {self.sequence}', section='turn')
 
         self.turn_no += 1
 
-        self.wait_and_check_button_press()
+        await wait_and_check_button_press(self)
 
 
     async def game_over(self):
