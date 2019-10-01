@@ -181,7 +181,6 @@ class Match():
     async def intro_sequence(self):
         await self.send_message(text="Welcome to *Simón!*", file=discord.File('Artwork/simón_instructions.png'), section='intro')
         await asyncio.sleep(1)
-        await asyncio.sleep(0.5)
         await self.add_buttons(buttons=self.buttons, section='intro')
 
 
@@ -207,8 +206,8 @@ async def simon(ctx, *, potential_buttons='🔴💚🔷🍊'):
         if match.status == 'failed':
             await match.remove_all_messages()
 
-            text = f"Score of: `{str(match.turn_no)}`! Thanks for playing Simón, `{match.player}`!\n🔴💚 To start a new match, type `!simon` 🔷🍊"
-            await match.send_message(text=text, section='thanks')
+            text = f"Score of: `{str(match.turn_no)}`! Thanks for playing Simón, `{match.player}`!"
+            await match.send_message(text=text, section='thanks', file=discord.File('Artwork/simón_end.png'))
             break
 
 
