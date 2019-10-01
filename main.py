@@ -140,7 +140,6 @@ class Match():
             while last_button_press == self.last_button_press:
                 await asyncio.sleep(0.1)
             else:
-                print(f'\n\n\n\n\n{self.last_button_press["button"].emoji}\n\n\n\n\n\n')
                 self.user_sequence += self.last_button_press['button'].emoji
 
             sequence_check = check_against_sequence(self.sequence, self.user_sequence) 
@@ -163,7 +162,7 @@ class Match():
 
 
     async def game_over(self):
-        self.send_message(text=f'You lost on turn {self.turn_no}.', sect='loss')
+        await self.send_message(text=f'You lost on turn {self.turn_no}.', section='loss')
 
 
 
