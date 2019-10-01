@@ -19,7 +19,7 @@ def increase_level(sequence, buttons):
     sequence.append(random.choice(buttons))
 
 
-def check_against_sequence(real_sequence, user_sequence):
+async def check_against_sequence(real_sequence, user_sequence):
     ''' Checks the user's sequence against the actual sequence.
 
         Args:
@@ -128,6 +128,7 @@ class Match():
     # --- Game
     async def button_pressed(self, *, user, button):
         if user == self.player.id:
+            print(button)
             button_press_id = self.last_button_press['id'] + 1
             self.last_button_press = {'id': button_press_id, 'button': button}
 
@@ -142,15 +143,17 @@ class Match():
             last_button_press = self.last_button_press
 
             while last_button_press == self.last_button_press:
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.00001)
             else:
                 self.user_sequence += self.last_button_press['button'].emoji
 
-            sequence_check = check_against_sequence(self.sequence, self.user_sequence) 
+            print(f'{self.user_sequence} : {self.sequence}')
+            sequence_check = await check_against_sequence(self.sequence, self.user_sequence) 
 
             if sequence_check == 'failed':
                 await self.game_over()
             elif sequence_check == 'passed':
+                print()
                 self.user_sequence = ''
                 return
             elif sequence_check == 'continue':
@@ -178,13 +181,18 @@ class Match():
     async def intro_sequence(self):
         await self.send_message(text="Welcome to *Simón!*", section='intro')
         await asyncio.sleep(1)
-        await self.append_to_message(text="\nLook at this net:", section='intro')
+        text = "\n\nI'm going to show a sequence in a comment, and you try to follow that sequence with the reactions!\n\n" \
+               "Don't worry about the number on the reactions, just follow the pattern (not too fast or the reacts won't register)!"
+        await self.append_to_message(text=text, section='intro')
+        await asyncio.sleep(0.5)
         await self.add_buttons(buttons=self.buttons, section='intro')
 
 
 
 # ---------- Globals -----------
 match = None
+
+
 
 # ---------- Commands ----------
 @bot.command()
