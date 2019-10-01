@@ -160,11 +160,11 @@ class Match():
         self.sequence = await self.add_to_sequence(self.sequence)
         await self.send_message(text=f'New sequence: {self.sequence}', section='turn')
 
-        self.turn_no += 1
-
         status = await wait_and_check_button_press(self)
         if status == 'failed':
             return status
+        else:
+            self.turn_no += 1
 
 
     async def game_over(self):
