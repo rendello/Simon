@@ -99,8 +99,11 @@ class Match():
 
 
     async def send_message(self, *, text, section):
-        _id = await self.ctx.send(text)
-        self.messages[section] = _id
+        if section in self.messages.keys():
+            _id = await self.messages[section].edit(content=text)
+        else:
+            _id = await self.ctx.send(text)
+            self.messages[section] = _id
 
 
     async def append_to_message(self, *, text, section):
