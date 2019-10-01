@@ -98,11 +98,11 @@ class Match():
         return buttons
 
 
-    async def send_message(self, *, text, section):
+    async def send_message(self, *, text, section, file=None):
         if section in self.messages.keys():
             _id = await self.messages[section].edit(content=text)
         else:
-            _id = await self.ctx.send(text)
+            _id = await self.ctx.send(text, file=file)
             self.messages[section] = _id
 
 
@@ -179,11 +179,8 @@ class Match():
 
 
     async def intro_sequence(self):
-        await self.send_message(text="Welcome to *Simón!*", section='intro')
+        await self.send_message(text="Welcome to *Simón!*", file=discord.File('Artwork/simón_instructions.png'), section='intro')
         await asyncio.sleep(1)
-        text = "\n\nI'm going to show a sequence in a comment, and you try to follow that sequence with the reactions!\n\n" \
-               "Don't worry about the number on the reactions, just follow the pattern (not too fast or the reacts won't register)!"
-        await self.append_to_message(text=text, section='intro')
         await asyncio.sleep(0.5)
         await self.add_buttons(buttons=self.buttons, section='intro')
 
