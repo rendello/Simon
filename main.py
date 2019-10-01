@@ -62,6 +62,7 @@ class Match():
         self.ctx = ctx
         self.messages = {}
         self.player = ctx.author
+        self.turn_no = 1
 
         self.last_button_press = {'id': 0, 'button': ''}
 
@@ -131,16 +132,37 @@ class Match():
 
     
     async def perform_turn(self):
-        #self.sequence = self.add_to_sequence(sequence)
-        #self.send_message(text='New sequence')
+        async def wait_and_check_button_press(self):
+            last_button_press = self.last_button_press
 
-        last_button_press = self.last_button_press
+            while last_button_press == self.last_button_press:
+                await asyncio.sleep(0.1)
+            else:
+                user_sequence.append(self.last_button_press.emoji)
 
-        while last_button_press == self.last_button_press:
-            await asyncio.sleep(3)
-            await self.ctx.send(f'{last_button_press} : {self.last_button_press}')
-        else:
-            await self.ctx.send(f'\n\n--UPDATED--\n\n')
+            sequence_check = check_against_sequence(self.sequence, user_sequence) 
+
+            if sequence_check == 'failed':
+                self.game_over()
+            elif sequence_check == 'passed':
+                return
+            elif sequence_check == 'continue':
+                self.wait_and_check_button_press()
+
+
+        self.sequence = self.add_to_sequence(sequence)
+        self.send_message(text='New sequence')
+
+        self.turn_no += 1
+
+        self.wait_and_check_button_press()
+
+
+    async def game_over(self):
+        self.send_message(text=f'You lost on turn {self.turn_no}.', sect='loss')
+
+
+
 
 
     async def intro_sequence(self):
@@ -163,6 +185,7 @@ async def simon(ctx, *, potential_buttons='🔴💚🔷🍊'):
     await match.async_init(ctx, potential_buttons)
 
     await match.intro_sequence()
+
     while True:
         await match.perform_turn()
 
