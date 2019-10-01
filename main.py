@@ -168,8 +168,10 @@ class Match():
 
 
     async def game_over(self):
-        await self.send_message(text=f'Oh No!!! You lost on turn {self.turn_no}!', section='loss')
-        asyncio.sleep(2)
+        await self.send_message(text=f'Oh No!!! You lost on turn `{self.turn_no}`!', section='loss')
+        await asyncio.sleep(.5)
+        await self.append_to_message(text="\nShutting down game in a few seconds!", section='loss')
+        await asyncio.sleep(3)
         self.status = 'failed'
 
 
@@ -197,11 +199,11 @@ async def simon(ctx, *, potential_buttons='🔴💚🔷🍊'):
     while True:
         await match.perform_turn()
 
-        print(match.status)
         if match.status == 'failed':
-            asyncio.wait(7)
             await match.remove_all_messages()
-            await match.send_message(text="Thanks for playing Simón! To start a new match, type !simon :D", section='thanks')
+
+            text = f"Score of: `{str(match.turn_no)}`! Thanks for playing Simón, `{match.player}`!\n🔴💚 To start a new match, type `!simon` 🔷🍊"
+            await match.send_message(text=text, section='thanks')
             break
 
 
