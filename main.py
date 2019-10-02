@@ -19,6 +19,14 @@ def increase_level(sequence, buttons):
     sequence.append(random.choice(buttons))
 
 
+def strip_non_emojis(text):
+    text = [c for c in text if c in emoji.UNICODE_EMOJI]
+    emoji_only_text = ''.join(text)
+    return emoji_only_text
+
+
+
+# -- User functions (async) ----
 async def check_against_sequence(real_sequence, user_sequence):
     ''' Checks the user's sequence against the actual sequence.
 
@@ -42,15 +50,6 @@ async def check_against_sequence(real_sequence, user_sequence):
             return "failed"
 
     return "continue"
-
-
-def strip_non_emojis(text):
-    text = [c for c in text if c in emoji.UNICODE_EMOJI]
-    emoji_only_text = ''.join(text)
-    return emoji_only_text
-
-
-# -- User functions (async) ----
 
 
 
@@ -82,9 +81,7 @@ class Match():
 
 
     async def get_buttons(self, potential_buttons):
-        ''' Gets the emojis sent to it and uses them if it can. Sets
-            self.buttons itself since __init__ won't accept asyncronous code.
-        '''
+        ''' Gets the emojis sent to it and uses them if it can. '''
         buttons = strip_non_emojis(potential_buttons)
 
         if buttons == '':
@@ -99,6 +96,7 @@ class Match():
 
 
     async def send_message(self, *, text, section, file=None):
+        ''' Sends a message, or replaces the message if the section is already used. '''
         if section in self.messages.keys():
             _id = await self.messages[section].edit(content=text)
         else:
@@ -107,6 +105,7 @@ class Match():
 
 
     async def append_to_message(self, *, text, section):
+        ''' Appends to message. If a full edit needed, see send_message. '''
         message = self.messages[section]
         await message.edit(content=f'{message.content}{text}')
 
@@ -140,6 +139,9 @@ class Match():
     
     async def perform_turn(self):
         async def wait_and_check_button_press(self):
+            '''
+            Note: 'self' isn't passed automatically, since it's not a class method.
+            '''
             last_button_press = self.last_button_press
 
             while last_button_press == self.last_button_press:
