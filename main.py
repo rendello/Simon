@@ -78,6 +78,21 @@ class Match():
             async.
         '''
         self.buttons = await self.get_buttons(potential_buttons)
+        await self.play_match()
+
+
+    async def play_match(self):
+        await self.intro_sequence()
+
+        while True:
+            await self.perform_turn()
+
+            if self.status == 'failed':
+                await self.remove_all_messages()
+
+                text = f"Score of: `{str(self.turn_no)}`! Thanks for playing Simón, `{self.player}`!"
+                await self.send_message(text=text, section='thanks', file=discord.File('Artwork/simón_end.png'))
+                break
 
 
     async def get_buttons(self, potential_buttons):
@@ -188,51 +203,36 @@ class Match():
 
 
 # ---------- Globals -----------
-match = None
+matches = {}
 
 
 
 # ---------- Commands ----------
 @bot.command()
 async def simon(ctx, *, potential_buttons='🔴💚🔷🍊'):
-    global match
-
-    match = Match(ctx)
-    await match.async_init(ctx, potential_buttons)
-
-    await match.intro_sequence()
-
-    while True:
-        await match.perform_turn()
-
-        if match.status == 'failed':
-            await match.remove_all_messages()
-
-            text = f"Score of: `{str(match.turn_no)}`! Thanks for playing Simón, `{match.player}`!"
-            await match.send_message(text=text, section='thanks', file=discord.File('Artwork/simón_end.png'))
-            break
-
+    matches[ctx.author.id] = Match(ctx)
+    await matches[ctx.author.id].async_init(ctx=ctx, potential_buttons=potential_buttons)
 
 
 # ----------- Events -----------
 @bot.event
 async def on_reaction_add(reaction, user):
-    global match
+    global matches
 
     message = reaction.message
 
-    if message.author.id == bot.user.id:
-        await match.button_pressed(user=user.id, button=reaction)
+    if (message.author.id == bot.user.id) and (user.id in matches.keys()):
+        await matches[user.id].button_pressed(user=user.id, button=reaction)
 
 
 @bot.event
 async def on_reaction_remove(reaction, user):
-    global match
+    global matches
 
     message = reaction.message
 
-    if message.author.id == bot.user.id:
-        await match.button_pressed(user=user.id, button=reaction)
+    if (message.author.id == bot.user.id) and (user.id in matches.keys()):
+        await matches[user.id].button_pressed(user=user.id, button=reaction)
 
 
 if __name__ == '__main__':
