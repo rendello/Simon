@@ -81,20 +81,6 @@ class Match():
         await self.play_match()
 
 
-    async def play_match(self):
-        await self.intro_sequence()
-
-        while True:
-            await self.perform_turn()
-
-            if self.status == 'failed':
-                await self.remove_all_messages()
-
-                text = f"Score of: `{str(self.turn_no)}`! Thanks for playing Simón, `{self.player}`!"
-                await self.send_message(text=text, section='thanks', file=discord.File('Artwork/simón_end.png'))
-                break
-
-
     async def get_buttons(self, potential_buttons):
         ''' Gets the emojis sent to it and uses them if it can. '''
         buttons = strip_non_emojis(potential_buttons)
@@ -145,6 +131,20 @@ class Match():
             print(button)
             button_press_id = self.last_button_press['id'] + 1
             self.last_button_press = {'id': button_press_id, 'button': button}
+
+
+    async def play_match(self):
+        await self.intro_sequence()
+
+        while True:
+            await self.perform_turn()
+
+            if self.status == 'failed':
+                await self.remove_all_messages()
+
+                text = f"Score of: `{str(self.turn_no)}`! Thanks for playing Simón, `{self.player}`!"
+                await self.send_message(text=text, section='thanks', file=discord.File('Artwork/simón_end.png'))
+                break
 
 
     async def add_to_sequence(self, sequence):
@@ -212,6 +212,7 @@ matches = {}
 async def simon(ctx, *, potential_buttons='🔴💚🔷🍊'):
     matches[ctx.author.id] = Match(ctx)
     await matches[ctx.author.id].async_init(ctx=ctx, potential_buttons=potential_buttons)
+
 
 
 # ----------- Events -----------
