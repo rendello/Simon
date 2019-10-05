@@ -128,10 +128,10 @@ class Match():
     # --- Game
     async def button_pressed(self, *, user, button):
         if user == self.player.id:
-            print(button)
             button_press_id = self.last_button_press['id'] + 1
             self.last_button_press = {'id': button_press_id, 'button': button}
             button_press.set()
+            button_press.clear()
 
 
     async def play_match(self):
@@ -160,8 +160,7 @@ class Match():
             '''
 
             await button_press.wait()
-            button_press.clear()
-            last_button_press = self.last_button_press
+            print(self.last_button_press)
             self.user_sequence += self.last_button_press['button'].emoji
 
             sequence_check = await check_against_sequence(self.sequence, self.user_sequence) 
@@ -221,6 +220,7 @@ async def on_reaction_add(reaction, user):
     message = reaction.message
 
     if (message.author.id == bot.user.id) and (user.id in matches.keys()):
+        print(reaction)
         await matches[user.id].button_pressed(user=user.id, button=reaction)
 
 
@@ -231,6 +231,7 @@ async def on_reaction_remove(reaction, user):
     message = reaction.message
 
     if (message.author.id == bot.user.id) and (user.id in matches.keys()):
+        print(reaction)
         await matches[user.id].button_pressed(user=user.id, button=reaction)
 
 
