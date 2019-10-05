@@ -131,6 +131,7 @@ class Match():
             print(button)
             button_press_id = self.last_button_press['id'] + 1
             self.last_button_press = {'id': button_press_id, 'button': button}
+            button_press.set()
 
 
     async def play_match(self):
@@ -157,20 +158,17 @@ class Match():
             '''
             Note: 'self' isn't passed automatically, since it's not a class method.
             '''
+
+            await button_press.wait()
+            button_press.clear()
             last_button_press = self.last_button_press
+            self.user_sequence += self.last_button_press['button'].emoji
 
-            while last_button_press == self.last_button_press:
-                await asyncio.sleep(0.00001)
-            else:
-                self.user_sequence += self.last_button_press['button'].emoji
-
-            print(f'{self.user_sequence} : {self.sequence}')
             sequence_check = await check_against_sequence(self.sequence, self.user_sequence) 
 
             if sequence_check == 'failed':
                 await self.game_over()
             elif sequence_check == 'passed':
-                print()
                 self.user_sequence = ''
                 return
             elif sequence_check == 'continue':
@@ -236,5 +234,9 @@ async def on_reaction_remove(reaction, user):
         await matches[user.id].button_pressed(user=user.id, button=reaction)
 
 
+button_press = asyncio.Event()
+
+
+# ------- Program Start --------
 if __name__ == '__main__':
     bot.run(discord_secret)
