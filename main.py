@@ -10,7 +10,9 @@ from discord.ext import commands
 from secrets import discord_secret
 
 
+# ---------- Globals -----------
 bot = commands.Bot(command_prefix="!")
+matches = {}
 
 
 
@@ -196,11 +198,6 @@ class Match():
         await self.send_message(text="Welcome to *Simón!*", file=discord.File('Artwork/simón_instructions.png'), section='intro')
         await asyncio.sleep(1)
         await self.add_buttons(buttons=self.buttons, section='intro')
-
-
-
-# ---------- Globals -----------
-matches = {}
 
 
 
